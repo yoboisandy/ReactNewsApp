@@ -1,25 +1,69 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import React, { Component } from "react";
+import Navbar from "./components/Navbar";
+import LoadingBar from "react-top-loading-bar";
+
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import NewsContainer from "./components/NewsContainer";
+
+export default class App extends Component {
+  state = {
+    categories: [
+      "business",
+      "entertainment",
+      "general",
+      "health",
+      "science",
+      "sports",
+      "technology",
+    ],
+    progress: 0,
+  };
+
+  setProgress = (p) => {
+    this.setState({ progress: p });
+  };
+  render() {
+    return (
+      <Router>
+        <div className="bg-gray-300">
+          <LoadingBar color="#FFFFFF" progress={this.state.progress} />
+          <Navbar categories={this.state.categories} />
+          <Routes>
+            <Route
+              exact
+              path="/"
+              element={
+                <NewsContainer
+                  setProgress={this.setProgress}
+                  key={"general"}
+                  pageSize={15}
+                  category="general"
+                  country={"in"}
+                />
+              }
+            />
+            {this.state.categories.map((el) => {
+              return (
+                <Route
+                  exact
+                  path={`/${el}`}
+                  element={
+                    <NewsContainer
+                      setProgress={this.setProgress}
+                      key={el}
+                      pageSize={15}
+                      category={el}
+                      country={"in"}
+                    />
+                  }
+                />
+              );
+            })}
+          </Routes>
+        </div>
+      </Router>
+    );
+  }
 }
-
-export default App;
