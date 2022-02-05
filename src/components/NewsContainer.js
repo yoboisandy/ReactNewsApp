@@ -1,112 +1,83 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import NewsCatalog from "./NewsCatalog";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Spinner from "./Spinner";
 
-export default class NewsContainer extends Component {
-  static defaultProps = {
-    category: "general",
-    pageSize: 3,
-    country: "us",
+const NewsContainer = (props) => {
+  const [articles, setArticles] = useState([]);
+  const [loading, setloading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(0);
+  const [totalResults, setTotalResults] = useState(0);
+
+  const getNews = async () => {
+    props.setProgress(70);
+    let url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=160256bbedf34d29950357f82f3c2351&pageSize=${props.pageSize}&page=${this.state.page}`;
+    setloading(true);
+    let data = await fetch(url);
+    props.setProgress(90);
+    let parsedData = await data.json();
+    props.setProgress(95);
+    setArticles(parsedData.articles);
+    setTotalPage(Math.ceil(parsedData.totalResults / props.pageSize));
+    setTotalResults(parsedData.totalResults);
+    setloading(false);
+    props.setProgress(100);
+    console.log(articles);
   };
 
-  constructor() {
-    super();
-    this.state = {
-      articles: [],
-      loading: false,
-      page: 1,
-      totalPage: 0,
-      totalResults: 0,
-    };
-  }
-
-  async getNews() {
-    this.props.setProgress(70);
-    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=160256bbedf34d29950357f82f3c2351&pageSize=${this.props.pageSize}&page=${this.state.page}`;
-    this.setState({ loading: true });
-    let data = await fetch(url);
-    this.props.setProgress(90);
-    let parsedData = await data.json();
-    this.props.setProgress(95);
-    this.setState({ articles: parsedData.articles });
-    this.setState({
-      totalPage: Math.ceil(parsedData.totalResults / this.props.pageSize),
-      totalResults: parsedData.totalResults,
-    });
-    this.setState({ loading: false });
-    this.props.setProgress(100);
-    console.log(this.state.articles);
-  }
-
-  // onNext = () => {
-  // this.setState({ page: this.state.page + 1 });
-  // this.getNews();
-  // };
-  // onPrev = () => {
-  //   this.setState({ page: this.state.page - 1 });
-  //   this.getNews();
-  // };
-
-  fetchMoreData = async () => {
+  const fetchMoreData = async () => {
     console.log("ferch more data");
-    this.setState({ page: this.state.page + 1 });
-    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=160256bbedf34d29950357f82f3c2351&pageSize=${this.props.pageSize}&page=${this.state.page}`;
-    this.setState({ loading: false });
+    setPage(page + 1);
+
+    let url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=160256bbedf34d29950357f82f3c2351&pageSize=${props.pageSize}&page=${page}`;
+    setloading(false);
     let data = await fetch(url);
     let parsedData = await data.json();
     console.log(parsedData);
-    this.setState({
-      articles: this.state.articles.concat(parsedData.articles),
-      totalResults: parsedData.totalResults,
-    });
-    console.log(this.state.articles.length + " " + this.state.totalResults);
+    setArticles(articles.concat(parsedData.articles));
+    setTotalResults(parsedData.totalResults);
+    console.log(articles.length + " " + totalResults);
   };
 
-  componentDidMount() {
-    this.setState({ page: this.state.page + 1 });
-    this.getNews();
-    document.title = `News Monkey - ${this.props.category}`;
-  }
+  useEffect(() => {
+    document.title = `News Monkey - ${props.category}`;
+    getNews();
+  }, []);
 
-  render() {
-    return (
-      <div className="">
-        <div className="pt-6 pb-12 px-4">
-          <h2 className="text-center font-serif mb-6 uppercase text-4xl xl:text-5xl">
-            Top {this.props.category} Headlines
-          </h2>
-          {this.state.loading ? (
-            <Spinner padding="py-40" widthHeight="w-40 h-40" />
-          ) : (
-            ""
-          )}
-          <div className="space-y-8">
-            <InfiniteScroll
-              dataLength={this.state.articles.length}
-              next={this.fetchMoreData}
-              hasMore={this.state.page !== this.state.totalPage}
-              loader={<Spinner padding="py-10" widthHeight="w-16 h-16" />}
-            >
-              {this.state.articles.map((element) => {
-                return (
-                  <NewsCatalog
-                    key={element.url ?? ""}
-                    title={element.title ?? ""}
-                    description={element.description ?? ""}
-                    date={element.publishedAt ?? ""}
-                    source={element.source.name ?? ""}
-                    image={
-                      element.urlToImage ??
-                      "https://bs-uploads.toptal.io/blackfish-uploads/components/blog_post_page/content/cover_image_file/cover_image/687822/regular_800x320_cover-react-context-api-4929b3703a1a7082d99b53eb1bbfc31f.png"
-                    }
-                    url={element.url ?? ""}
-                  />
-                );
-              })}
-            </InfiniteScroll>
-          </div>
-          {/* {this.state.totalPage > 1 ? (
+  return (
+    <div className="">
+      <div className="pt-6 pb-6 px-4">
+        <h2 className="text-center font-bold font-serif mb-6 uppercase text-md xl:text-2xl">
+          Top {props.category} Headlines
+        </h2>
+        {loading ? <Spinner padding="py-40" widthHeight="w-40 h-40" /> : ""}
+        <div className="space-y-8">
+          <InfiniteScroll
+            dataLength={articles.length}
+            next={fetchMoreData}
+            hasMore={page !== totalPage}
+            loader={<Spinner padding="py-10" widthHeight="w-16 h-16" />}
+          >
+            {articles.map((element) => {
+              return (
+                <NewsCatalog
+                  key={element.url ?? ""}
+                  title={element.title ?? ""}
+                  description={element.description ?? ""}
+                  date={element.publishedAt ?? ""}
+                  source={element.source.name ?? ""}
+                  image={
+                    element.urlToImage ??
+                    "https://bs-uploads.toptal.io/blackfish-uploads/components/blog_post_page/content/cover_image_file/cover_image/687822/regular_800x320_cover-react-context-api-4929b3703a1a7082d99b53eb1bbfc31f.png"
+                  }
+                  url={element.url ?? ""}
+                />
+              );
+            })}
+          </InfiniteScroll>
+        </div>
+        {/* {this.state.totalPage > 1 ? (
             <div className="pt-6 flex justify-center">
               <nav aria-label="Page navigation">
                 <ul class="inline-flex">
@@ -145,8 +116,15 @@ export default class NewsContainer extends Component {
           ) : (
             ""
           )} */}
-        </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
+
+NewsContainer.defaultProps = {
+  category: "general",
+  pageSize: 3,
+  country: "us",
+};
+
+export default NewsContainer;
