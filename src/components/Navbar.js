@@ -16,13 +16,13 @@ const Navbar = (props) => {
   };
 
   return (
-    <header className="text-gray-100 sticky body-font">
+    <header className="text-gray-100 sticky top-0 right-0 left-0 z-10 body-font">
       <div className=" shadow-lg bg-purple-600 mx-auto flex flex-wrap py-2 px-4 md:px-6 justify-between md:flex-row items-center">
         <Link
           to="/"
           className="flex title-font font-medium items-center text-gray-900  md:mb-0"
         >
-          <span className="ml-3 text-xl text-white">Monkey News</span>
+          <span className="ml-3 text-xl text-white">Sandy News</span>
         </Link>
         <nav
           id="md-nav"
@@ -94,7 +94,7 @@ const Navbar = (props) => {
       </div>
       <nav
         id="sm-nav"
-        className="md:ml-auto w-40 md:hidden flex hidden bg-purple-600 absolute right-0  flex-col items-center text-base justify-center space-y-3 py-4"
+        className="md:ml-auto w-40 md:hidden flex hidden bg-purple-600 absolute right-0  flex-col items-center text-base space-y-7 justify-center py-4"
       >
         <Link
           to="/"
@@ -104,7 +104,7 @@ const Navbar = (props) => {
         </Link>
         <span
           onClick={handleMenuMouseOver}
-          className="font-bold md:hover:bg-purple-700 md:p-2 hover:rounded cursor-pointer"
+          className="font-bold space-y-7 md:hover:bg-purple-700 md:p-2 hover:rounded cursor-pointer"
         >
           {props.categories.map((e) => {
             return (

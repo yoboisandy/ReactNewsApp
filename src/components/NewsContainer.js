@@ -11,26 +11,32 @@ const NewsContainer = (props) => {
   const [totalResults, setTotalResults] = useState(0);
 
   const getNews = async () => {
-    props.setProgress(70);
-    let url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=160256bbedf34d29950357f82f3c2351&pageSize=${props.pageSize}&page=${this.state.page}`;
+    props.assignProgress(70);
+    let url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=160256bbedf34d29950357f82f3c2351&pageSize=${props.pageSize}&page=${page}`;
     setloading(true);
     let data = await fetch(url);
-    props.setProgress(90);
+    props.assignProgress(90);
     let parsedData = await data.json();
-    props.setProgress(95);
+    props.assignProgress(95);
     setArticles(parsedData.articles);
     setTotalPage(Math.ceil(parsedData.totalResults / props.pageSize));
     setTotalResults(parsedData.totalResults);
     setloading(false);
-    props.setProgress(100);
+    props.assignProgress(100);
     console.log(articles);
   };
 
   const fetchMoreData = async () => {
     console.log("ferch more data");
-    setPage(page + 1);
 
-    let url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=160256bbedf34d29950357f82f3c2351&pageSize=${props.pageSize}&page=${page}`;
+    let url = `https://newsapi.org/v2/top-headlines?country=${
+      props.country
+    }&category=${
+      props.category
+    }&apiKey=160256bbedf34d29950357f82f3c2351&pageSize=${props.pageSize}&page=${
+      page + 1
+    }`;
+    setPage(page + 1);
     setloading(false);
     let data = await fetch(url);
     let parsedData = await data.json();

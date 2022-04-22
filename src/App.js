@@ -19,7 +19,7 @@ const App = () => {
   ]);
   const [progress, setProgress] = useState(0);
 
-  setProgress = (p) => {
+  const assignProgress = (p) => {
     setProgress(p);
   };
 
@@ -34,7 +34,7 @@ const App = () => {
             path="/"
             element={
               <NewsContainer
-                setProgress={setProgress}
+                assignProgress={assignProgress}
                 key={"general"}
                 pageSize={15}
                 category="general"
@@ -49,7 +49,7 @@ const App = () => {
                 path={`/${el}`}
                 element={
                   <NewsContainer
-                    setProgress={setProgress}
+                    assignProgress={assignProgress}
                     key={el}
                     pageSize={15}
                     category={el}
